@@ -7,6 +7,12 @@ import configparser
 ## This section contains the token-related API calls
 ###########################################################################
 
+URL = "https://us.api.blizzard.com"
+
+PARSER = configparser.ConfigParser()
+PARSER.read('.env')
+CURR_TOKEN = PARSER.get('tokens', 'TOKEN')
+
 def token_check():
     PARSER = configparser.ConfigParser()
     PARSER.read('.env')
@@ -41,7 +47,37 @@ def token_gen(CLIENTID, CLIENTSECRET):
 
     return TOKEN_DATA['access_token']
 
+def token_validation():
+    
+
+
+    API_HTTP_PATH = "/oauth/check_token"
+    REGION = "us"
+    NAMESPACE = "profile-us"
+    LOCALE = "en_US"    
+    PARAMS = {'token':CURR_TOKEN, 'region':REGION, 'namespace':NAMESPACE, 'locale':LOCALE}
+    FULL_URL = f"{URL}{API_HTTP_PATH}"
+    RESULT = requests.post(FULL_URL, params=PARAMS).json()
+
+    print(RESULT)
+
 ###########################################################################
 ###########################################################################
 
-token_check()
+def character_achievements(CHAR_NAME, CHAR_REALM):
+    
+    API_HTTP_PATH = f"/profile/wow/character/{CHAR_REALM}/{CHAR_NAME}/achievements"
+    REGION = "us"
+    NAMESPACE = "profile-us"
+    LOCALE = "en_US"
+    PARAMS = {'region':REGION, 'namespace':NAMESPACE, 'locale':LOCALE}
+    FULL_URL = f"{URL}{API_HTTP_PATH}"
+    RESULT = requests.get(FULL_URL, headers=AUTH_HEADER, params=PARAMS).json()
+    print(RESULT)
+    
+    return True
+
+###########################################################################
+###########################################################################
+
+token_validation()
