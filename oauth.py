@@ -89,6 +89,39 @@ def user_info(): # uses the POST method, recommended by Blizzard over GET
 	print(RESULT)
 
 ###########################################################################
+## This section contains the Application Authentication calls
+###########################################################################
+
+def access_apptoken_request():
+	CLIENT_ID = PARSER.get('creds', 'client_id')
+	CLIENT_SECRET = PARSER.get('creds', 'client_secret')
+	API_HTTP_PATH = "/oauth/token"
+	GRANT_TYPE = "client_credentials"
+	SCOPE = "wow.profile"
+	PARAMS = {'grant_type':GRANT_TYPE,
+	'scope':SCOPE}
+	FULL_URL = f"{URL}{API_HTTP_PATH}"
+
+	RESULT = requests.post(FULL_URL, auth=(CLIENT_ID, CLIENT_SECRET), params=PARAMS).json()
+
+	AUTH_TOKEN = RESULT['access_token']
+	AUTH_EXPIRATION = str(RESULT['expires_in'])
+	AUTH_SCOPE = RESULT['scope']
+	AUTH_TYPE = RESULT['token_type']
+
+	# injects the new token data into the .env file for future use
+	PARSER.set('tokens', 'token', AUTH_TOKEN)
+	PARSER.set('tokens', 'expiration', AUTH_EXPIRATION)
+	PARSER.set('tokens', 'scope', AUTH_SCOPE)
+	PARSER.set('tokens', 'type', AUTH_TYPE)
+	
+	# open and save the .env file with new configparser changes
+	ENVFILE = open('.env', 'w')
+	PARSER.write(ENVFILE)
+	ENVFILE.close()
+
+
+###########################################################################
 ## This section contains the Token Validation calls
 ###########################################################################
 
@@ -115,5 +148,6 @@ def token_validation():
 
 #authorization_request()
 #access_token_request()
+access_apptoken_request()
 #user_info()
-token_validation()
+#token_validation()
