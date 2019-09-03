@@ -21,8 +21,10 @@ def authorization_request():
 	REDIRECT_URI = "https://localhost"
 	SCOPE = "wow.profile"
 	FULL_URL = f"{URL}{API_HTTP_PATH}"
-	PARAMS = {'response_type':RESPONSE_TYPE, 'client_id':CLIENT_ID,
-			  'redirect_uri':REDIRECT_URI, 'scope':SCOPE}
+	PARAMS = {'response_type':RESPONSE_TYPE,
+	'client_id':CLIENT_ID,
+	'redirect_uri':REDIRECT_URI,
+	'scope':SCOPE}
 	RESULT = requests.get(FULL_URL, params=PARAMS).url
 	
 	print(f"""Paste the following URL into a web browser and enter the new code
@@ -42,7 +44,8 @@ def access_token_request():
 	GRANT_TYPE = "authorization_code"
 	REDIRECT_URI = "https://localhost"
 	SCOPE = "wow.profile"
-	PARAMS = {'grant_type':GRANT_TYPE, 'code':AUTH_CODE,
+	PARAMS = {'grant_type':GRANT_TYPE,
+	'code':AUTH_CODE,
 	'redirect_uri':REDIRECT_URI,
 	'scope':SCOPE}
 	FULL_URL = f"{URL}{API_HTTP_PATH}"
@@ -54,11 +57,13 @@ def access_token_request():
 	OAUTH_SCOPE = RESULT['scope']
 	OAUTH_TYPE = RESULT['token_type']
 	
-	# inject the new token data into the .env file for future use
+	# injects the new token data into the .env file for future use
 	PARSER.set('codeflow', 'token', OAUTH_TOKEN)
 	PARSER.set('codeflow', 'expiration', OAUTH_EXPIRATION)
 	PARSER.set('codeflow', 'scope', OAUTH_SCOPE)
 	PARSER.set('codeflow', 'type', OAUTH_TYPE)
+	
+	# open and save the .env file with new configparser changes
 	ENVFILE = open('.env', 'w')
 	PARSER.write(ENVFILE)
 	ENVFILE.close()
@@ -71,14 +76,14 @@ def access_token_request():
 
 	return True
 
-def user_info():
+def user_info(): # uses the POST method, recommended by Blizzard over GET
 
 	API_HTTP_PATH = "/oauth/userinfo"
 	OAUTH_TOKEN = PARSER.get('codeflow', 'token')
 	HEADER = f"Bearer {OAUTH_TOKEN}"
 	AUTH_HEADER = {'Authorization': HEADER}
-
 	FULL_URL = f"{URL}{API_HTTP_PATH}"
+	
 	RESULT = requests.get(FULL_URL, headers=AUTH_HEADER).json()
 
 	print(RESULT)
@@ -112,6 +117,3 @@ def token_validation():
 #access_token_request()
 #user_info()
 token_validation()
-
-
-#https://us.battle.net/oauth/authorize?client_id=d6a7fcd3ec8a4147a9016cd3b91953a4&
